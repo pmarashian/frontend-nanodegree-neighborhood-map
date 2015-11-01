@@ -1,0 +1,24 @@
+{
+  "name": "frontend-nanodegree-neighborhood-map",
+  "version": "1.0.0",
+  "homepage": "https://github.com/pmarashian/frontend-nanodegree-neighborhood-map",
+  "authors": [
+    "pmarashian <phillip.marashian@gmail.com>"
+  ],
+  "description": "Neighborhood Map",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "knockout": "~3.3.0",
+    "bootstrap": "~3.3.5",
+    "underscore": "~1.8.3"
+  }
+}
