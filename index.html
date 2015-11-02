@@ -4,9 +4,12 @@
 
     <title>Neighborhood Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="build/styles.css">
+
+    <!--<link rel="stylesheet" href="deploy/frontend-nanodegree-neighborhood-map.min.css">-->
 
 </head>
 
@@ -38,7 +41,8 @@
                 <ul class="list-group" id="listings">
                     <a class="list-group-item active">West San Jose</a>
                     <!-- ko foreach: listings -->
-                    <button type="button" class="list-group-item" data-bind="visible: show, text: title, click: $parent.focusOnMarker"></button>
+                    <button type="button" class="list-group-item"
+                            data-bind="visible: show, text: title, click: $parent.focusOnMarker"></button>
                     <!-- /ko -->
                 </ul>
 
@@ -59,21 +63,46 @@
 <script type="text/template" id="infoWindowContent-template">
     <div class="row info-content-row">
         <div class="col-xs-10 col-sm-12">
-            <img src="<%= image %>" alt="" class="hidden-xs img-thumbnail pull-left">
-            <h2><%= title %></h2>
-            <h3><%= display_phone %></h3>
-            <p><%= description %></p>
+
+            <div class="row">
+
+                <div class="col-sm-2">
+                    <img src="<%= image %>" alt="" class="hidden-xs img-thumbnail">
+                </div>
+
+                <div class="col-sm-10">
+
+                    <div class="content-wrapper">
+                        <h2 class="title"><%= title %></h2>
+                        <h3 class="address"><% print(address) %></h3>
+                        <h3 class="phone"><%= display_phone %></h3>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <p class="description"><%= description %></p>
+                </div>
+            </div>
+
         </div>
     </div>
 </script>
 
 <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
+
+
 <script src="bower_components/underscore/underscore-min.js"></script>
 <script src="bower_components/knockout/dist/knockout.js"></script>
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/jquery.nicescroll/jquery.nicescroll.min.js"></script>
-
 <script src="build/scripts.js"></script>
+
+<!--<script src="deploy/frontend-nanodegree-neighborhood-map.min.js"></script>-->
 
 </body>
 

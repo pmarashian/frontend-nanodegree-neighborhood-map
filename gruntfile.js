@@ -28,8 +28,13 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             build: {
-                src: 'src/js/**/*.js',
-                dest: 'build/<%= pkg.name %>.min.js'
+                src: [
+                    'bower_components/underscore/underscore-min.js',
+                    'bower_components/knockout/dist/knockout.js',
+                    'bower_components/jquery/dist/jquery.min.js',
+                    'bower_components/jquery.nicescroll/jquery.nicescroll.min.js',
+                    'src/js/**/*.js'],
+                dest: 'deploy/<%= pkg.name %>.min.js'
             }
         },
         cssmin: {
@@ -37,8 +42,10 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             build: {
-                src: 'src/css/**/*.css',
-                dest: 'build/<%= pkg.name %>.min.css'
+                src: [
+                    'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                    'src/css/**/*.css'],
+                dest: 'deploy/<%= pkg.name %>.min.css'
             }
         },
         concat: {
@@ -70,5 +77,6 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('default', ['concat']);
     grunt.registerTask('delta', ['concat', 'watch']);
+    grunt.registerTask('build', ['uglify', 'cssmin']);
 
 };
