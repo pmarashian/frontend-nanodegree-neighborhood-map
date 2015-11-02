@@ -1,5 +1,74 @@
 .container-fluid {
     padding: 0;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* http://stackoverflow.com/questions/22156387/twitter-bootstrap-column-and-google-maps-not-working-together */
+html, body {
+    height: 100%;
+}.list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+}
+
+.list-group-item {
+    border-right: none;
+    padding-left: 25px;
+}
+
+/* full width styles from http://stackoverflow.com/questions/19089384/twitter-bootstrap-3-two-columns-full-height */
+.list-view {
+    padding-bottom: 100%;
+    margin-bottom: -100%;
+    border-right: 1px #ccc solid;
+    padding-right: 0;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+.list-view .list-group {
+    margin-bottom: 0;
+}
+
+#list-group-wrapper {
+    overflow: hidden;
+}#map {
+    width: 100%;
+}
+
+.map-view {
+    height: 100%;
+    padding-left: 0;
+    overflow: hidden;
+    background-color: #ccc;
+}
+
+.info-content-row {
+    margin: 0;
+}
+
+.info-content-row img {
+    margin-right: 10px;
+}
+
+.info-content-row h2 {
+    margin-top: 0;
+}
+
+@media only screen and (max-width:767px) {
+
+    .info-content-row h2 {
+        font-size: 20px;
+    }
+
+    .info-content-row h3 {
+        font-size: 15px;
+    }
+
 }.search-bar .input-group-addon, .search-bar .form-control {
     -webkit-border-radius: 0 0 0 0;
     border-radius: 0 0 0 0;

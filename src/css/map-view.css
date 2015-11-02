@@ -1,0 +1,34 @@
+#map {
+    width: 100%;
+}
+
+.map-view {
+    height: 100%;
+    padding-left: 0;
+    overflow: hidden;
+    background-color: #ccc;
+}
+
+.info-content-row {
+    margin: 0;
+}
+
+.info-content-row img {
+    margin-right: 10px;
+}
+
+.info-content-row h2 {
+    margin-top: 0;
+}
+
+@media only screen and (max-width:767px) {
+
+    .info-content-row h2 {
+        font-size: 20px;
+    }
+
+    .info-content-row h3 {
+        font-size: 15px;
+    }
+
+}

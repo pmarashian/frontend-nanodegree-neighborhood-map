@@ -12,7 +12,14 @@ module.exports = function(grunt) {
                 tasks: ['concat:styles'],
                 options: {
                     spawn: false,
-                },
+                }
+            },
+            scripts: {
+                files: ['src/js/**/*.js'],
+                tasks: ['concat:scripts'],
+                options: {
+                    spawn: false
+                }
             },
         },
 
@@ -42,6 +49,14 @@ module.exports = function(grunt) {
                 },
                 src: ['src/css/**/*.css'],
                 dest: 'build/styles.css'
+            },
+
+            scripts: {
+                options: {
+                    separator: '\r\r'
+                },
+                src: ['src/js/**/*.js'],
+                dest: 'build/scripts.js'
             }
 
         }
@@ -54,5 +69,6 @@ module.exports = function(grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['concat']);
+    grunt.registerTask('delta', ['concat', 'watch']);
 
 };

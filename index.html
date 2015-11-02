@@ -12,16 +12,43 @@
 
 <body>
 
-<div class="container-fluid search-bar">
+<div class="container-fluid">
 
-    <div class="row">
+    <div class="row search-bar">
 
         <div class="col-xs-12">
 
             <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">Search</span>
-                <input type="text" class="form-control" placeholder="Search Locations" aria-describedby="basic-addon1">
+                <span class="input-group-addon">Search</span>
+                <input type="text" class="form-control"
+                       placeholder="Search within West San Jose"
+                       data-bind="textInput: filter">
             </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2 list-view">
+
+            <div id="list-group-wrapper">
+
+                <ul class="list-group" id="listings">
+                    <a class="list-group-item active">West San Jose</a>
+                    <!-- ko foreach: listings -->
+                    <button type="button" class="list-group-item" data-bind="visible: show, text: title, click: $parent.focusOnMarker"></button>
+                    <!-- /ko -->
+                </ul>
+
+            </div>
+
+        </div>
+
+        <div class="col-xs-8 col-sm-8 col-md-9 col-lg-10 map-view">
+
+            <div id="map"></div>
 
         </div>
 
@@ -29,9 +56,24 @@
 
 </div>
 
+<script type="text/template" id="infoWindowContent-template">
+    <div class="row info-content-row">
+        <div class="col-xs-10 col-sm-12">
+            <img src="<%= image %>" alt="" class="hidden-xs img-thumbnail pull-left">
+            <h2><%= title %></h2>
+            <h3><%= display_phone %></h3>
+            <p><%= description %></p>
+        </div>
+    </div>
+</script>
 
+<script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
 <script src="bower_components/underscore/underscore-min.js"></script>
 <script src="bower_components/knockout/dist/knockout.js"></script>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/jquery.nicescroll/jquery.nicescroll.min.js"></script>
+
+<script src="build/scripts.js"></script>
 
 </body>
 

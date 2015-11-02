@@ -1,0 +1,28 @@
+.list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+}
+
+.list-group-item {
+    border-right: none;
+    padding-left: 25px;
+}
+
+/* full width styles from http://stackoverflow.com/questions/19089384/twitter-bootstrap-3-two-columns-full-height */
+.list-view {
+    padding-bottom: 100%;
+    margin-bottom: -100%;
+    border-right: 1px #ccc solid;
+    padding-right: 0;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+.list-view .list-group {
+    margin-bottom: 0;
+}
+
+#list-group-wrapper {
+    overflow: hidden;
+}
