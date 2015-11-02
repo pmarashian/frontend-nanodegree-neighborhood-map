@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/pmarashian/frontend-nanodegree-neighborhood-map#readme",
   "devDependencies": {
+    "express": "^4.13.3",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-cssmin": "^0.14.0",
