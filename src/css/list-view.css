@@ -26,3 +26,7 @@
 #list-group-wrapper {
     overflow: hidden;
 }
+
+.list-view .no-hover:hover {
+    background-color: #fff;
+}

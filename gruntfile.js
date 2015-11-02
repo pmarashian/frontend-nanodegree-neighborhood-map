@@ -33,17 +33,20 @@ module.exports = function(grunt) {
                     'bower_components/knockout/dist/knockout.js',
                     'bower_components/jquery/dist/jquery.min.js',
                     'bower_components/jquery.nicescroll/jquery.nicescroll.min.js',
+                    'bower_components/q/q.js',
                     'src/js/**/*.js'],
                 dest: 'deploy/<%= pkg.name %>.min.js'
             }
         },
         cssmin: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                rebase: true
             },
             build: {
                 src: [
                     'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                    'bower_components/font-awesome/css/font-awesome.min.css',
                     'src/css/**/*.css'],
                 dest: 'deploy/<%= pkg.name %>.min.css'
             }

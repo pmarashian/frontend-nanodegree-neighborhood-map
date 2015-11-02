@@ -45,4 +45,8 @@
         font-size: 15px;
     }
 
+    .info-content-row .content-wrapper {
+        margin-left: 0;
+    }
+
 }

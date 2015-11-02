@@ -17,7 +17,7 @@ app.get('/yelp', function(res, req){
     yelp.search({term: "", location: "812 Saratoga, 95129", limit: 20}, function(error, data) {
 
         if( error ) {
-            req.send( error );
+            req.send({});
         } else {
             req.send( data );
         }
