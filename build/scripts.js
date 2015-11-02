@@ -299,8 +299,6 @@
 
             var mapOptions = {
                 disableDefaultUI: true
-                //center: {lat: region.center.latitude, lng: region.center.longitude},
-                //zoom: 15
             };
 
             map = new google.maps.Map(document.querySelector('#map'), mapOptions);
