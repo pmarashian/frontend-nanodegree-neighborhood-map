@@ -3,6 +3,7 @@
     'use strict';
 
     var map,
+        activeInfoWindow,
         infoWindowTemplate = _.template( $('#infoWindowContent-template').html() );
 
     /**
@@ -81,12 +82,22 @@
         this.closeWindow = function() {
             infoWindow.close();
             marker.setAnimation( null );
+
+            activeInfoWindow = null;
+
         };
 
         this.openWindow = function() {
+
+            if( activeInfoWindow ) {
+                activeInfoWindow.close();
+            }
+
             map.panTo( new google.maps.LatLng(lat, lon) );
             marker.setAnimation( google.maps.Animation.BOUNCE );
             infoWindow.open( map, marker );
+
+            activeInfoWindow = infoWindow;
         };
 
         this.toggle = function(val){
@@ -111,7 +122,7 @@
 
         // set up variables
         this.listings = ko.observableArray([]);
-        this.activeListing = ko.observable( null );
+        this.activeListing = ko.observable();
         this.filter = ko.observable('');
         this.neighborhood = ko.observable('West San Jose');
         this.loading = ko.observable( false );
@@ -281,8 +292,10 @@
         this.focusOnMarker = function( listing ){
 
             // close the info window if one was already open.
-            if( vm.activeListing() ) {
-                vm.activeListing().marker.closeWindow();
+            if( activeInfoWindow ) {
+
+                activeInfoWindow.close();
+
             }
 
             listing.marker.openWindow();
