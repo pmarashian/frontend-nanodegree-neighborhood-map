@@ -1,4 +1,9 @@
 // TODO Fix mobile portrait layout
+// Move navigation to bottom and move up down to display it.
+// make map full screen and overlay list on top of it
+//
+// TODO Add a-z sort and category sort
+// display categories in list view
 // TODO Add another api
 // TODO Add custom icons
 // TODO Add jquery autocomplete
@@ -58,6 +63,8 @@ var Listing = function( data ) {
  */
 var Marker = function( listing ) {
 
+    console.log( Math.floor( (window.screen.width * 0.80) ) );
+
     var self = this,
 
         lat = listing.location().coordinate.latitude,
@@ -73,7 +80,8 @@ var Marker = function( listing ) {
         }),
 
         infoWindow = new google.maps.InfoWindow({
-            content: infoWindowContent( listing )
+            content: infoWindowContent( listing ),
+            maxWidth: Math.floor( (window.screen.width * 0.70) )
         });
 
     google.maps.event.addListener( infoWindow, 'closeclick', function(){
@@ -206,8 +214,6 @@ var ViewModel = function() {
 
                     vm.loading( false );
 
-                    console.log( response );
-
                     d.resolve( response );
 
                 }
@@ -270,10 +276,22 @@ var ViewModel = function() {
      */
     this.setSizes = function() {
 
+        //https://davidwalsh.name/orientation-change
+
+        console.log( window.screen.width, 'width' );
+        console.log( window.screen.height, 'height' );
+        console.log( window.orientation, 'orientation' );
+
         var offsetTop = $('.search-bar').height(),
             height = $(window).height() - offsetTop;
 
-        $('#map, #list-group-wrapper').css('height', height );
+        console.log( height );
+
+        //$('#map, #list-group-wrapper').css('height', height );
+
+        $('#map').css('height', height );
+
+        $('#list-group-wrapper').css('height', height * 0.35 );
 
         $("#list-group-wrapper").niceScroll();
 
