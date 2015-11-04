@@ -37,7 +37,7 @@
 
     <div class="row">
 
-        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2 list-view">
+        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2 list-view" data-bind="css: { bottom: onSmallScreen() }">
 
             <div id="list-group-wrapper">
 
@@ -48,7 +48,7 @@
                     <a style="display: none;" class="list-group-item active"
                        data-bind="text: neighborhood, visible: neighborhood"></a>
 
-                    <!-- ko foreach: listings -->
+                    <!-- ko foreach: { data: listings, afterRender: setSizes } -->
                     <button type="button" class="list-group-item"
                             data-bind="visible: show, text: title, click: $parent.focusOnMarker"></button>
                     <!-- /ko -->
@@ -65,7 +65,7 @@
 
         </div>
 
-        <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10 map-view">
+        <div class="col-xs-8 col-sm-8 col-md-9 col-lg-10 map-view" data-bind="css: { bottom: onSmallScreen() }">
 
             <div id="map"></div>
 

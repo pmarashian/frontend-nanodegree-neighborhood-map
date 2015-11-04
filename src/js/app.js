@@ -1,12 +1,9 @@
-// TODO Fix mobile portrait layout
-// Move navigation to bottom and move up down to display it.
-// make map full screen and overlay list on top of it
-//
 // TODO Add a-z sort and category sort
-// display categories in list view
-// TODO Add another api
+// TODO display categories in list view
+// TODO Add foursquare api
 // TODO Add custom icons
-// TODO Add jquery autocomplete
+// TODO Add jquery autocomplete.  Use bootstrap typeahead
+// https://github.com/bassjobsen/Bootstrap-3-Typeahead
 // TODO Update README file
 
 'use strict';
@@ -14,6 +11,8 @@
 var map,
     activeMarker,
     infoWindowTemplate = _.template( $('#infoWindowContent-template').html() );
+
+var SMALL_SCREEN_MAX_WIDTH = 420;
 
 /**
  * @description Helper function to generate the html content for the map infoWindow
@@ -62,8 +61,6 @@ var Listing = function( data ) {
  * @param {object} listing - Listing object created from yelp results
  */
 var Marker = function( listing ) {
-
-    console.log( Math.floor( (window.screen.width * 0.80) ) );
 
     var self = this,
 
@@ -146,6 +143,17 @@ var ViewModel = function() {
         return "Search within " + this.neighborhood();
     }, this);
 
+    // store reference to DOM elements
+    var $window = $(window),
+        $map = $('#map'),
+        $searchBar = $('.search-bar'),
+        $listView = $('.list-view'),
+        $listWrapper = $('#list-group-wrapper'),
+        $listButton = $('a.list-group-item.active')[0];
+
+    // misc variables to keep track of items that need to initialized once.
+    var niceScrollInit = false;
+
     /**
      * @description Initialization function.
      */
@@ -167,6 +175,11 @@ var ViewModel = function() {
         window.addEventListener('resize', function(){
             vm.setSizes();
         });
+
+        //https://davidwalsh.name/orientation-change
+        window.addEventListener("orientationchange", function() {
+            vm.setSizes();
+        }, false);
 
     };
 
@@ -274,27 +287,73 @@ var ViewModel = function() {
     /**
      * @description Sets the list view and map heights. Inits the scrolling plugin for the list view.
      */
-    this.setSizes = function() {
+    this.setSizes = function( arg ) {
 
-        //https://davidwalsh.name/orientation-change
+        var windowHeight = $window.height(),
+            smallScreen = vm.onSmallScreen(),
+            offsetTop = $searchBar.height(),
+            mapHeight = windowHeight - offsetTop,
 
-        console.log( window.screen.width, 'width' );
-        console.log( window.screen.height, 'height' );
-        console.log( window.orientation, 'orientation' );
+            // if we are on a small screen (portrait) place the list view
+            // so it takes up the bottom 35% of the view
+            listHeight = smallScreen ? mapHeight * 0.35 : mapHeight,
+            listViewTop, listItemHeight, actualListHeight;
 
-        var offsetTop = $('.search-bar').height(),
-            height = $(window).height() - offsetTop;
+            // We need to set top to either the bottom 35% of screen or 0
 
-        console.log( height );
+        if( !smallScreen ) {
 
-        //$('#map, #list-group-wrapper').css('height', height );
+            listViewTop = 0;
 
-        $('#map').css('height', height );
+        } else {
 
-        $('#list-group-wrapper').css('height', height * 0.35 );
+            // the height of the list view needs to be adjusted based on the search query.
 
-        $("#list-group-wrapper").niceScroll();
+            // get height of the button.  This is always visible.
+            listItemHeight = $listButton.offsetHeight;
 
+            // Calculate actual height of the list based on visible listings.
+            // We need to add the button to the calculation.  it doesn't count as a visible listing.
+            actualListHeight = listItemHeight * ( 1 + vm.numVisibleListings() );
+
+            // override it the actual height that it should be is less
+            if( listHeight > actualListHeight ) {
+
+                listHeight = actualListHeight;
+
+            }
+
+            listViewTop = windowHeight - listHeight;
+
+        }
+
+        $map.css('height', mapHeight );
+        $listWrapper.css('height', listHeight );
+
+        // using niceScroll on the initial app load doesn't work
+        // leaves the listView with a height of 0. Haven't figured out why
+        // on the init load arg is undefined.
+        // on subsequent calls during the afterRender event arg is an object
+        // and calling niceSroll works as expected.
+
+        if( ! _.isUndefined(arg) && !niceScrollInit ) {
+
+            $listWrapper.niceScroll();
+
+            niceScrollInit = true;
+
+        }
+
+        $listView.css('top', listViewTop );
+
+
+    };
+
+    /**
+     * @description Helper function to determine if on mobile portrait.
+     */
+    this.onSmallScreen = function() {
+        return window.screen.width < SMALL_SCREEN_MAX_WIDTH;
     };
 
     /**
@@ -365,6 +424,8 @@ var ViewModel = function() {
 
         });
 
+        vm.setSizes();
+
         /**
          * @description Helper function for filtering searches.
          * @param {string} search - Search term to check against
@@ -372,6 +433,25 @@ var ViewModel = function() {
         function inSearchFilter( search ) {
             return search.toLowerCase().indexOf( searchTerm ) > -1
         }
+
+    };
+
+    /**
+     * @description Returns number of listings that are visible based on current search query
+     */
+    this.numVisibleListings = function() {
+
+        var count = 0;
+
+        _.each( vm.listings(), function(listing){
+
+            if( listing.show() ) {
+                count++;
+            }
+
+        });
+
+        return count;
 
     };
 
@@ -385,5 +465,6 @@ var ViewModel = function() {
 };
 
 function initApp() {
+
     ko.applyBindings( new ViewModel() );
 }

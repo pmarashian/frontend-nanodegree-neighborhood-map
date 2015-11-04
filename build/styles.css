@@ -91,17 +91,19 @@ html, body {
         margin-left: 0;
     }
 
-}@media screen and ( max-width:767px ) {
+}.list-view.bottom {
+    position: absolute;
+    z-index: 5;
+    padding: 0;
+    margin: 0;
+    left: 0;
+    top: 65%;
+    width: 100%;
+    border-top: 1px #ccc solid;
+}
 
-    .list-view {
-        position: absolute;
-        z-index: 5;
-        padding: 0;
-        margin: 0;
-        left: 0;
-        top: 65%;
-    }
-
+.map-view.bottom {
+    width: 100%;
 }.search-bar .input-group-addon, .search-bar .form-control {
     -webkit-border-radius: 0 0 0 0;
     border-radius: 0 0 0 0;
