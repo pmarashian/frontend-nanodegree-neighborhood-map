@@ -1,6 +1,8 @@
 // TODO Add a-z sort and category sort
 // TODO display categories in list view
 // TODO Add foursquare api
+// https://developer.foursquare.com/docs/venues/categories
+// https://foursquare.com/developers/app/ZLJR2IBOBBRLYV241TT3LVMGSBAWLI1MD3WM31UU4KNZK3TV
 // TODO Add custom icons
 // TODO Add jquery autocomplete.  Use bootstrap typeahead
 // https://github.com/bassjobsen/Bootstrap-3-Typeahead
