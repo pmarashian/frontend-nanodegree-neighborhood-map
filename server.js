@@ -3,181 +3,175 @@ var express = require('express'),
     request = require('request'),
     _       = require('underscore'),
     $q      = require('q'),
+    fs      = require('fs'),
     app     = express();
+
+var YELP_CONSUMER_KEY = 'gwAYuuSRjk7DsmUhiqcq_A',
+    YELP_CONSUMER_SECRET = 'BahLIkgpGDB3-Au3EFVc8vWX1FI',
+    YELP_TOKEN = 'YabNVKBCLM0VMsk1AMAA0uXildOi53Ad',
+    YELP_TOKEN_SECRET = 'OBzsZAWc2NpgfI5-JrRBVLU34xI',
+
+    FS_CLIENT_ID = 'ZLJR2IBOBBRLYV241TT3LVMGSBAWLI1MD3WM31UU4KNZK3TV',
+    FS_CLIENT_SECRET = 'WA0AKNMEKXLCWO3JDV2JP14OGJB2KTDDKKACFQSF3W3Z2XJ1',
+
+    LOCATION = '812 Saratoga, 95129';
+
+
 
 // https://github.com/olalonde/node-yelp
 var yelp = require("yelp").createClient({
-    consumer_key: "gwAYuuSRjk7DsmUhiqcq_A",
-    consumer_secret: "BahLIkgpGDB3-Au3EFVc8vWX1FI",
-    token: "YabNVKBCLM0VMsk1AMAA0uXildOi53Ad",
-    token_secret: "OBzsZAWc2NpgfI5-JrRBVLU34xI"
+    consumer_key: YELP_CONSUMER_KEY,
+    consumer_secret: YELP_CONSUMER_SECRET,
+    token: YELP_TOKEN,
+    token_secret: YELP_TOKEN_SECRET
 });
 
 app.use( express.static( __dirname ) );
 
 app.get('/yelp', function(req, res){
 
-    yelp.search({term: "", location: "812 Saratoga, 95129", limit: 20}, function(error, data) {
+    var response = {};
+    response.results = [];
 
-        var response = {};
+    getYelpResults()
+        .then( getFoursquareResults )
+        .then( function(){
 
-        if( error ) {
+            /*fs.writeFile('./results.json', JSON.stringify( response ), function(err){
+                console.log(err);
+            });*/
 
-            res.send({error:true});
-
-        } else {
-
-            response.region = data.region;
-            response.results = [];
-
-            _.mapObject( data.businesses, function(item){
-
-                var categories = [];
-
-                _.each( item.categories, function(cat){
-                    categories.push( cat[0] );
-                });
-
-                response.results.push({
-                    id : item.id,
-                    title: item.name,
-                    img: item.image_url,
-                    description: item.snippet_text,
-                    location: {
-                        latitude: item.location.coordinate.latitude,
-                        longitude: item.location.coordinate.longitude,
-                        display_address: item.location.display_address
-                    },
-                    phone: item.phone,
-                    display_phone: item.display_phone.replace('+1-',''),
-                    categories: categories
-                });
-
+            res.send( response );
+        })
+        .catch( function(e){
+            res.send({
+                error: true
             });
+        });
 
-            var api = 'https://api.foursquare.com/v2/venues/explore',
+    function getYelpResults() {
 
-                options = {
-                    near: '812 saratoga 95129',
-                    v: '20151104',
-                    client_id :'ZLJR2IBOBBRLYV241TT3LVMGSBAWLI1MD3WM31UU4KNZK3TV',
-                    client_secret : 'WA0AKNMEKXLCWO3JDV2JP14OGJB2KTDDKKACFQSF3W3Z2XJ1'
-                };
+        var d = $q.defer();
 
-            var url = api + '?';
+        yelp.search({term: "", location: LOCATION, limit: 20}, function(error, data) {
 
-            _.mapObject( options, function(val, key){
+            if( error ) {
 
-                url += '&' + key + '=' + encodeURIComponent( val );
+                d.reject( error );
 
-            });
+            } else {
 
-            request.get( url, cb );
+                response.region = data.region;
 
-            function cb( error, requestResponse, body ) {
+                _.mapObject( data.businesses, function(item){
 
-                var results = JSON.parse( body );
+                    var categories = [];
 
-                if( error ) {
-
-                    res.send({error:true});
-
-                } else {
-
-                    _.mapObject( results.response.groups[0].items, function(item){
-
-                        var categories = [];
-
-                        _.each( item.venue.categories, function(cat){
-                            categories.push( cat.name );
-                        });
-
-                        response.results.push({
-                            id : item.venue.id,
-                            title: item.venue.name,
-                            img: '',
-                            description: '',
-                            location: {
-                                latitude: item.venue.location.lat,
-                                longitude: item.venue.location.lng,
-                                display_address: item.venue.location.formattedAddress
-                            },
-                            phone: item.venue.contact.phone,
-                            display_phone: item.venue.contact.formattedPhone,
-                            categories: categories
-                        });
-
+                    _.each( item.categories, function(cat){
+                        categories.push( cat[0] );
                     });
 
-                    res.send( response );
+                    response.results.push({
+                        id : item.id,
+                        title: item.name,
+                        img: item.image_url,
+                        description: item.snippet_text,
+                        location: {
+                            latitude: item.location.coordinate.latitude,
+                            longitude: item.location.coordinate.longitude,
+                            display_address: item.location.display_address
+                        },
+                        phone: item.phone,
+                        display_phone: item.display_phone.replace('+1-',''),
+                        categories: categories
+                    });
 
-                }
+                });
+
+                d.resolve();
+
+            }
+
+        });
+
+        return d.promise;
+
+    }
+
+    function getFoursquareResults() {
+
+        var d = $q.defer(),
+
+            api = 'https://api.foursquare.com/v2/venues/explore',
+
+            options = {
+                near: LOCATION,
+                v: '20151104',
+                client_id: FS_CLIENT_ID,
+                client_secret : FS_CLIENT_SECRET
+            },
+
+            url = api + '?';
+
+        _.mapObject( options, function(val, key){
+
+            url += '&' + key + '=' + encodeURIComponent( val );
+
+        });
+
+        request.get( url, cb );
+
+        return d.promise;
+
+        function cb( error, requestResponse, body ) {
+
+            var results = JSON.parse( body );
+
+            if( error ) {
+
+                d.reject();
+
+            } else {
+
+                _.mapObject( results.response.groups[0].items, function(item){
+
+                    // do not add duplicates from Yelp response
+                    if( _.findWhere(response.results, { title: item.venue.name } ) ) {
+                        return;
+                    }
+
+
+                    var categories = [];
+
+                    _.each( item.venue.categories, function(cat){
+                        categories.push( cat.name );
+                    });
+
+                    response.results.push({
+                        id : item.venue.id,
+                        title: item.venue.name,
+                        img: '',
+                        description: '',
+                        location: {
+                            latitude: item.venue.location.lat,
+                            longitude: item.venue.location.lng,
+                            display_address: item.venue.location.formattedAddress
+                        },
+                        phone: item.venue.contact.phone,
+                        display_phone: item.venue.contact.formattedPhone,
+                        categories: categories
+                    });
+
+                });
+
+                d.resolve();
 
             }
 
         }
 
-    });
-
-});
-
-app.get('/f', function(req, res){
-
-    var api = 'https://api.foursquare.com/v2/venues/explore',
-
-        options = {
-            near: '812 saratoga 95129',
-            v: '20151104',
-            client_id :'ZLJR2IBOBBRLYV241TT3LVMGSBAWLI1MD3WM31UU4KNZK3TV',
-            client_secret : 'WA0AKNMEKXLCWO3JDV2JP14OGJB2KTDDKKACFQSF3W3Z2XJ1'
-        };
-
-    var url = api + '?';
-
-    _.mapObject( options, function(val, key){
-
-        url += '&' + key + '=' + encodeURIComponent( val );
-
-    });
-
-    request.get( url, cb );
-
-    function cb( error, response, body ) {
-
-        var response = {};
-        response.results = [];
-
-        var results = JSON.parse( body );
-
-        if( error ) {
-
-            res.send({error:true});
-
-        } else {
-
-            _.mapObject( results.response.groups[0].items, function(item){
-
-                response.results.push({
-                    id : item.venue.id,
-                    title: item.venue.name,
-                    img: '',
-                    description: '',
-                    location: {
-                        latitude: item.venue.location.lat,
-                        longitude: item.venue.location.lng,
-                        display_address: item.venue.location.formattedAddress
-                    },
-                    phone: item.venue.contact.phone,
-                    display_phone: item.venue.contact.formattedPhone
-                });
-
-            });
-
-            res.send( response );
-
-        }
-
     }
+
 
 });
 

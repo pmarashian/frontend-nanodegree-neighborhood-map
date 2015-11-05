@@ -109,7 +109,15 @@ var Marker = function( listing ) {
         marker.setAnimation( google.maps.Animation.BOUNCE );
         infoWindow.open( map, marker );
 
+        if( listing.img() == '' ) {
+
+            $('.image-col').removeClass('col-sm-2');
+            $('.content-col').addClass('col-sm-12').removeClass('col-sm-10');
+
+        }
+
         activeMarker = self;
+
     };
 
     this.toggle = function(val){
