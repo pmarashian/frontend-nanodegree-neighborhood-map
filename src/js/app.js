@@ -1,8 +1,5 @@
 // TODO Add a-z sort and category sort
 // TODO display categories in list view
-// TODO Add foursquare api
-// https://developer.foursquare.com/docs/venues/categories
-// https://foursquare.com/developers/app/ZLJR2IBOBBRLYV241TT3LVMGSBAWLI1MD3WM31UU4KNZK3TV
 // TODO Add custom icons
 // TODO Update README file
 
@@ -15,7 +12,7 @@ var map,
 // Config constants used in the app.
 var SMALL_SCREEN_MAX_WIDTH = 420,
     WIDTH_FACTOR_INFO_WINDOW_MOBILE_PORTRAIT = 0.70,
-    WIDTH_FACTOR_INFO_WINDOW_OTHER = 0.50;
+    WIDTH_FACTOR_INFO_WINDOW_OTHER = 1;
 
 /**
  * @description Helper function to generate the html content for the map infoWindow
@@ -35,17 +32,18 @@ var infoWindowContent = function( listing ) {
 
 /**
  * @description Model object for a single listing.
+ * @constructor
  * @param {object} data - Data object returned from yelp request.
  */
 var Listing = function( data ) {
 
     this.id = ko.observable( data.id );
-    this.title = ko.observable( data.name );
-    this.img = ko.observable( data.image_url );
-    this.description = ko.observable( data.snippet_text );
+    this.title = ko.observable( data.title );
+    this.img = ko.observable( data.img );
+    this.description = ko.observable( data.description );
     this.location = ko.observable( data.location );
     this.phone = ko.observable( data.phone );
-    this.display_phone = ko.observable( data.display_phone.replace('+1-','') );
+    this.display_phone = ko.observable( data.display_phone );
 
     /* used in list view to filter results */
     this.show = ko.observable( true );
@@ -61,14 +59,15 @@ var Listing = function( data ) {
 
 /**
  * @description Object for a single map marker. Handles interactions with the view.
+ * @constructor
  * @param {object} listing - Listing object created from yelp results
  */
 var Marker = function( listing ) {
 
     var self = this,
 
-        lat = listing.location().coordinate.latitude,
-        lon = listing.location().coordinate.longitude,
+        lat = listing.location().latitude,
+        lon = listing.location().longitude,
         title = listing.title(),
         listing = listing,
         maxWidthFactor = window.screen.width < SMALL_SCREEN_MAX_WIDTH ? WIDTH_FACTOR_INFO_WINDOW_MOBILE_PORTRAIT : WIDTH_FACTOR_INFO_WINDOW_OTHER,
@@ -127,6 +126,7 @@ var Marker = function( listing ) {
 
 /**
  * @description Main viewModel for the app.
+ * @constructor
  */
 var ViewModel = function() {
 
@@ -176,7 +176,7 @@ var ViewModel = function() {
 
         }
 
-        this.initAutoComplete( this.listings() );
+        this.initAutoComplete();
 
         window.addEventListener('resize', function(){
             vm.setSizes();
@@ -193,14 +193,14 @@ var ViewModel = function() {
      * @description Initializes autocomplete on the search input
      * @param {array} records - Data source for the autocomplete box.
      */
-    this.initAutoComplete = function( records ) {
+    this.initAutoComplete = function() {
 
         var $input = $('#search');
 
         $input
             .typeahead({
 
-                source: records,
+                source: vm.listings(),
 
                 matcher: function( item ) {
                     // "this" typeahead instance
@@ -277,10 +277,10 @@ var ViewModel = function() {
 
                 if(_.has( response, 'region') ) {
 
-                    vm.addListings( response.businesses );
+                    vm.addListings( response.results );
 
                     vm.save( 'region', JSON.stringify( response.region ) );
-                    vm.save( 'listings', JSON.stringify( response.businesses ));
+                    vm.save( 'listings', JSON.stringify( response.results ));
                     vm.save( 'searchFilter', vm.filter() );
 
                     vm.updateFilterResults();
@@ -525,6 +525,10 @@ var ViewModel = function() {
 
 };
 
+
+/**
+ * @description Callback function for google maps script tag.
+ */
 function initApp() {
 
     ko.applyBindings( new ViewModel() );
