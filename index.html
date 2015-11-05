@@ -24,7 +24,7 @@
 
             <div class="input-group">
                 <span class="input-group-addon">Search</span>
-                <input type="text" class="form-control"
+                <input id="search" type="text" class="form-control"
                        data-bind="textInput: filter, attr:{ placeholder: searchPlaceholder }">
                 <span class="input-group-addon"><i
                         data-bind="click: refresh, css: { 'fa-spin': loading }"
@@ -113,6 +113,7 @@
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/jquery.nicescroll/jquery.nicescroll.min.js"></script>
 <script src="bower_components/q/q.js"></script>
+<script src="bower_components/bootstrap3-typeahead/bootstrap3-typeahead.min.js"></script>
 <script src="build/scripts.js"></script>
 
 <script async src="http://maps.googleapis.com/maps/api/js?libraries=places&callback=initApp"></script>

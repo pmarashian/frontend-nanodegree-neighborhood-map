@@ -34,6 +34,7 @@ module.exports = function(grunt) {
                     'bower_components/jquery/dist/jquery.min.js',
                     'bower_components/jquery.nicescroll/jquery.nicescroll.min.js',
                     'bower_components/q/q.js',
+                    'bower_components/bootstrap3-typeahead/bootstrap3-typeahead.min.js',
                     'src/js/**/*.js'],
                 dest: 'deploy/<%= pkg.name %>.min.js'
             }

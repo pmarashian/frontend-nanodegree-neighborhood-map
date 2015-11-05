@@ -4,8 +4,6 @@
 // https://developer.foursquare.com/docs/venues/categories
 // https://foursquare.com/developers/app/ZLJR2IBOBBRLYV241TT3LVMGSBAWLI1MD3WM31UU4KNZK3TV
 // TODO Add custom icons
-// TODO Add jquery autocomplete.  Use bootstrap typeahead
-// https://github.com/bassjobsen/Bootstrap-3-Typeahead
 // TODO Update README file
 
 'use strict';
@@ -14,7 +12,10 @@ var map,
     activeMarker,
     infoWindowTemplate = _.template( $('#infoWindowContent-template').html() );
 
-var SMALL_SCREEN_MAX_WIDTH = 420;
+// Config constants used in the app.
+var SMALL_SCREEN_MAX_WIDTH = 420,
+    WIDTH_FACTOR_INFO_WINDOW_MOBILE_PORTRAIT = 0.70,
+    WIDTH_FACTOR_INFO_WINDOW_OTHER = 0.50;
 
 /**
  * @description Helper function to generate the html content for the map infoWindow
@@ -70,6 +71,7 @@ var Marker = function( listing ) {
         lon = listing.location().coordinate.longitude,
         title = listing.title(),
         listing = listing,
+        maxWidthFactor = window.screen.width < SMALL_SCREEN_MAX_WIDTH ? WIDTH_FACTOR_INFO_WINDOW_MOBILE_PORTRAIT : WIDTH_FACTOR_INFO_WINDOW_OTHER,
 
         marker = new google.maps.Marker({
             map: map,
@@ -80,7 +82,7 @@ var Marker = function( listing ) {
 
         infoWindow = new google.maps.InfoWindow({
             content: infoWindowContent( listing ),
-            maxWidth: Math.floor( (window.screen.width * 0.70) )
+            maxWidth: Math.floor( (window.screen.width * maxWidthFactor) )
         });
 
     google.maps.event.addListener( infoWindow, 'closeclick', function(){
@@ -174,6 +176,8 @@ var ViewModel = function() {
 
         }
 
+        this.initAutoComplete( this.listings() );
+
         window.addEventListener('resize', function(){
             vm.setSizes();
         });
@@ -186,14 +190,68 @@ var ViewModel = function() {
     };
 
     /**
+     * @description Initializes autocomplete on the search input
+     * @param {array} records - Data source for the autocomplete box.
+     */
+    this.initAutoComplete = function( records ) {
+
+        var $input = $('#search');
+
+        $input
+            .typeahead({
+
+                source: records,
+
+                matcher: function( item ) {
+                    // "this" typeahead instance
+                    // item is the listing record
+                    return vm.inSearchFilter( item.title(), this.query );
+                },
+
+                displayText: function( item ) {
+                    return item.title();
+                },
+
+                afterSelect: function( item ) {
+
+                },
+
+                updater: function( item ) {
+                    return item;
+                }
+
+            })
+
+            .change(function() {
+
+                var current = $input.typeahead("getActive");
+
+                if (current) {
+
+                    if (current.title() == $input.val()) {
+                        // current active for typeahead ( which is a listing) is same as input val
+                        // therefore there is only one listing shown.
+
+                        vm.centerMap( current.location().coordinate.latitude, current.location().coordinate.longitude );
+
+                    }
+
+                }
+
+            });
+
+    };
+
+    /**
      * @description Centers the map to a location
      * @param {object} region - Region object returned from yelp api.
      */
-    this.centerMap = function( region ) {
+    this.centerMap = function( latitude, longitude ) {
 
         map.setCenter( {
-            lat: region.center.latitude,
-            lng: region.center.longitude} );
+            lat: latitude,
+            lng: longitude
+        });
 
         map.setZoom(15);
 
@@ -260,7 +318,7 @@ var ViewModel = function() {
                     vm.addListings( listings );
                     vm.filter( filter );
 
-                    vm.centerMap( region );
+                    vm.centerMap( region.center.latitude, region.center.longitude );
 
                     dataLoaded = true;
 
@@ -408,15 +466,15 @@ var ViewModel = function() {
 
             var show = false;
 
-            if( inSearchFilter( listing.title() ) ) {
+            if( vm.inSearchFilter( listing.title(), searchTerm ) ) {
 
                 show = true;
 
-            } else if ( inSearchFilter( listing.description() ) ) {
+            } else if ( vm.inSearchFilter( listing.description(), searchTerm ) ) {
 
                 show = true;
 
-            } else if ( inSearchFilter( listing.phone() ) ) {
+            } else if ( vm.inSearchFilter( listing.phone(), searchTerm ) ) {
 
                 show = true;
 
@@ -428,14 +486,15 @@ var ViewModel = function() {
 
         vm.setSizes();
 
-        /**
-         * @description Helper function for filtering searches.
-         * @param {string} search - Search term to check against
-         */
-        function inSearchFilter( search ) {
-            return search.toLowerCase().indexOf( searchTerm ) > -1
-        }
+    };
 
+    /**
+     * @description Helper function for filtering searches.
+     * @param {string} haystack - Haystack to check against
+     * @param {string} needle - Needle to search for
+     */
+    this.inSearchFilter = function( haystack, needle ) {
+        return haystack.toLowerCase().indexOf( needle.toLowerCase() ) > -1
     };
 
     /**
@@ -469,4 +528,5 @@ var ViewModel = function() {
 function initApp() {
 
     ko.applyBindings( new ViewModel() );
+
 }
