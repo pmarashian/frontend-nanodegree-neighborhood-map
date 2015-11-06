@@ -4,6 +4,7 @@ module.exports = function(grunt) {
 
     // Project configuration.
     grunt.initConfig({
+
         pkg: grunt.file.readJSON('package.json'),
 
         clean: ['temp'],
@@ -38,10 +39,11 @@ module.exports = function(grunt) {
                 dest: 'deploy/<%= pkg.name %>.min.js'
             }
         },
+
         cssmin: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-                rebase: true
+                rebase: false
             },
             build: {
                 src: [
@@ -52,6 +54,7 @@ module.exports = function(grunt) {
             }
 
         },
+
         concat: {
 
             styles: {
@@ -97,6 +100,24 @@ module.exports = function(grunt) {
                 dest: 'build/scripts.js'
             }
 
+        },
+
+        copy: {
+            dist: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: 'bower_components/bootstrap/dist',
+                    src: ['fonts/*.*'],
+                    dest: 'deploy'
+                }, {
+                    expand: true,
+                    dot: true,
+                    cwd: 'bower_components/font-awesome',
+                    src: ['fonts/*.*'],
+                    dest: 'deploy'
+                }]
+            }
         }
     });
 
@@ -105,6 +126,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task(s).
     grunt.registerTask('default', ['build']);
