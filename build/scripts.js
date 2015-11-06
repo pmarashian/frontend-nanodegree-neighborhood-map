@@ -255,6 +255,9 @@ var ViewModel = function() {
 
             vm.refresh()
                 .then( function( response ){
+
+                    console.log( response.region );
+
                     vm.centerMap( response.region );
                 });
 
@@ -348,7 +351,7 @@ var ViewModel = function() {
 
         vm.listings([]);
 
-        $.ajax( 'results', {
+        $.ajax( 'results.json', {
             success: function( response ) {
 
                 if(_.has( response, 'region') ) {
