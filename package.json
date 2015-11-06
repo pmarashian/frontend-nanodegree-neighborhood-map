@@ -32,6 +32,7 @@
     "yelp": "^0.2.0",
     "request": "~2.65.0",
     "underscore": "~1.8.3",
-    "q": "~1.4.1"
+    "q": "~1.4.1",
+    "grunt-contrib-clean": "~0.6.0"
   }
 }

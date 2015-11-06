@@ -6,6 +6,8 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
+        clean: ['temp'],
+
         watch: {
             styles: {
                 files: ['src/css/**/*.css'],
@@ -29,7 +31,11 @@ module.exports = function(grunt) {
                     banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
                 },
                 src: ['src/js/app.js'],
-                dest: 'deploy/source.min.js'
+                dest: 'temp/source.min.js'
+            },
+            deploy: {
+                src: 'temp/deploy.js',
+                dest: 'deploy/<%= pkg.name %>.min.js'
             }
         },
         cssmin: {
@@ -44,6 +50,7 @@ module.exports = function(grunt) {
                     'src/css/**/*.css'],
                 dest: 'deploy/<%= pkg.name %>.min.css'
             }
+
         },
         concat: {
 
@@ -60,15 +67,15 @@ module.exports = function(grunt) {
                     separator: '\r\r'
                 },
                 src: [
-                    'bower_components/underscore/underscore-min.js',
+                    'bower_components/underscore/underscore.js',
                     'bower_components/knockout/dist/knockout.js',
-                    'bower_components/jquery/dist/jquery.min.js',
+                    'bower_components/jquery/dist/jquery.js',
                     'bower_components/jquery.nicescroll/jquery.nicescroll.js',
                     'bower_components/q/q.js',
                     'bower_components/bootstrap3-typeahead/bootstrap3-typeahead.min.js',
                     'bower_components/fontawesome-markers/fontawesome-markers.min.js'
                 ],
-                dest: 'deploy/vendors.js'
+                dest: 'temp/vendors.js'
             },
 
             deploy: {
@@ -76,10 +83,10 @@ module.exports = function(grunt) {
 
                 },
                 src: [
-                    'deploy/vendors.js',
-                    'deploy/source.min.js'
+                    'temp/vendors.js',
+                    'temp/source.min.js'
                 ],
-                dest: 'deploy/<%= pkg.name %>.min.js'
+                dest: 'temp/deploy.js'
             },
 
             scripts: {
@@ -97,10 +104,18 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default task(s).
     grunt.registerTask('default', ['build']);
     grunt.registerTask('delta', ['concat:styles', 'concat:scripts', 'watch']);
-    grunt.registerTask('build', ['uglify', 'concat:vendors', 'concat:deploy', 'cssmin']);
+
+    // uglify source file
+    // concat vendor files
+    // concat vendor file with uglified source file
+    // uglify the concat'ed file
+    // cssmin
+    // clean the temp dir
+    grunt.registerTask('build', ['uglify:build', 'concat:vendors', 'concat:deploy', 'uglify:deploy', 'cssmin', 'clean']);
 
 };
