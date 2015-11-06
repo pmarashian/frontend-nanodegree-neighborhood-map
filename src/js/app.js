@@ -255,7 +255,7 @@ var ViewModel = function() {
 
             vm.refresh()
                 .then( function( response ){
-                    vm.centerMap( response.region );
+                    vm.centerMap( response.region.center.latitude, response.region.center.longitude );
                 });
 
         }
