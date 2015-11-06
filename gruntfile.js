@@ -109,13 +109,13 @@ module.exports = function(grunt) {
                     dot: true,
                     cwd: 'bower_components/bootstrap/dist',
                     src: ['fonts/*.*'],
-                    dest: 'deploy'
+                    dest: ''
                 }, {
                     expand: true,
                     dot: true,
                     cwd: 'bower_components/font-awesome',
                     src: ['fonts/*.*'],
-                    dest: 'deploy'
+                    dest: ''
                 }]
             }
         }
