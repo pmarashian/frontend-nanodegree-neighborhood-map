@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "homepage": "https://github.com/pmarashian/frontend-nanodegree-neighborhood-map",
   "authors": [
-    "pmarashian <phillip.marashian@gmail.com>"
+    "Phillip Marashian <phillip.marashian@gmail.com>"
   ],
   "description": "Neighborhood Map",
   "main": "",
@@ -22,11 +22,11 @@
     "underscore": "~1.8.3",
     "jquery.nicescroll": "https://github.com/inuyaksa/jquery.nicescroll.git#~3.6.0",
     "bootstrap3-typeahead": "https://github.com/bassjobsen/Bootstrap-3-Typeahead.git#~3.1.1",
-    "fontawesome-markers": "https://github.com/nathan-muir/fontawesome-markers.git"
+    "fontawesome-markers": "https://github.com/nathan-muir/fontawesome-markers.git",
+    "font-awesome": "fontawesome#~4.4.0",
+    "q": "1.0.1"
   },
   "devDependencies": {
     "oauth-signature": "~1.3.0",
-    "font-awesome": "fontawesome#~4.4.0",
-    "q": "1.0.1"
   }
 }
