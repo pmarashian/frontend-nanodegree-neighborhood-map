@@ -348,7 +348,7 @@ var ViewModel = function() {
 
         vm.listings([]);
 
-        $.ajax( 'results', {
+        $.ajax( 'results.json', {
             success: function( response ) {
 
                 if(_.has( response, 'region') ) {
