@@ -28,7 +28,7 @@ var yelp = require("yelp").createClient({
 
 app.use( express.static( __dirname ) );
 
-app.get('/yelp', function(req, res){
+app.get('/results', function(req, res){
 
     var response = {};
     response.results = [];
@@ -180,6 +180,6 @@ var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
 
-    console.log('Example app listening at http://%s:%s', host, port);
+    console.log('Neighborhood Map app running');
 
 });

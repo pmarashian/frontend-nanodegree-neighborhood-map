@@ -1,6 +1,15 @@
 # frontend-nanodegree-neighborhood-map
 Project 5 of the Udacity Frontend Nanodgree
 
+##The App
+The app loads search results from Yelp and Foursquare for the area around Saratoga Ave & highway 280 in San Jose, Ca.
+
+Different markers are used to show restaurants and coffee shops.
+
+You can filter the search results with the search bar.
+
+Clicking on a marker opens up an infoWindow with data about the place.
+
 ##Getting Started
 This project uses an express (node) server to request listings from the yelp api.
 

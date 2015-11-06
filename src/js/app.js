@@ -1,8 +1,3 @@
-// TODO Add a-z sort and category sort
-// TODO display categories in list view
-// TODO Add custom icons
-// TODO Update README file
-
 'use strict';
 
 var map,
@@ -13,6 +8,25 @@ var map,
 var SMALL_SCREEN_MAX_WIDTH = 420,
     WIDTH_FACTOR_INFO_WINDOW_MOBILE_PORTRAIT = 0.70,
     WIDTH_FACTOR_INFO_WINDOW_OTHER = 1;
+
+// Config for custom icons
+var iconCategories = [
+    {
+        names: ['Restaurant','Pizza'],
+        prop: {
+            icon: fontawesome.markers.CUTLERY,
+            fillColor: '#f8ae5f'
+        }
+
+    },
+    {
+        names: ['Coffee'],
+        prop: {
+            icon: fontawesome.markers.COFFEE,
+            fillColor: '#f8ae5f'
+        }
+    }
+];
 
 /**
  * @description Helper function to generate the html content for the map infoWindow
@@ -44,6 +58,7 @@ var Listing = function( data ) {
     this.location = ko.observable( data.location );
     this.phone = ko.observable( data.phone );
     this.display_phone = ko.observable( data.display_phone );
+    this.categories = ko.observableArray( data.categories );
 
     /* used in list view to filter results */
     this.show = ko.observable( true );
@@ -72,33 +87,21 @@ var Marker = function( listing ) {
         listing = listing,
         maxWidthFactor = window.screen.width < SMALL_SCREEN_MAX_WIDTH ? WIDTH_FACTOR_INFO_WINDOW_MOBILE_PORTRAIT : WIDTH_FACTOR_INFO_WINDOW_OTHER,
 
-        marker = new google.maps.Marker({
-            map: map,
-            position: new google.maps.LatLng( lat, lon ),
-            title: title,
-            animation: google.maps.Animation.DROP
-        }),
+        marker, infoWindow;
 
-        infoWindow = new google.maps.InfoWindow({
-            content: infoWindowContent( listing ),
-            maxWidth: Math.floor( (window.screen.width * maxWidthFactor) )
-        });
-
-    google.maps.event.addListener( infoWindow, 'closeclick', function(){
-        marker.setAnimation( null );
-        activeMarker = null;
-    });
-
-    google.maps.event.addListener(marker, 'click', function(){
-        self.openWindow();
-    });
-
+    /**
+     * @description Handles closing an info window and reseting the marker status
+     */
     this.closeWindow = function() {
         infoWindow.close();
         marker.setAnimation( null );
         activeMarker = null;
     };
 
+    /**
+     * @description Handles opening an info window, setting marker status, and resetting status of
+     * a window that is already open
+     */
     this.openWindow = function() {
 
         if( activeMarker ) {
@@ -120,6 +123,10 @@ var Marker = function( listing ) {
 
     };
 
+    /**
+     * @description Toggles the visibility of a marker
+     * @param {bool} val - Visibility flag
+     */
     this.toggle = function(val){
 
         marker.setVisible( val );
@@ -129,6 +136,75 @@ var Marker = function( listing ) {
             this.closeWindow();
         }
     };
+
+    /**
+     * @description Handles what icon to show for a listing marker.
+     */
+    this.getIcon = function() {
+
+        var  props = {
+                path: fontawesome.markers.MAP_MARKER,
+                scale: 0.5,
+                strokeWeight: 0.2,
+                strokeColor: 'black',
+                strokeOpacity: 1,
+                fillColor: '#ff0000',
+                fillOpacity: 0.9
+            };
+
+        // search through each category and see if is one of the categories that
+        // has a custom icon
+        _.each( listing.categories(), function(cat){
+
+            _.each( iconCategories, function(iconCat){
+
+                _.each( iconCat.names, function(catName){
+
+                    if( inSearchFilter( cat, catName ) ) {
+
+                        props.path = iconCat.prop.icon;
+                        props.fillColor = iconCat.prop.fillColor;
+
+                    }
+
+                });
+
+
+
+            });
+
+        });
+
+        return props;
+
+
+
+    };
+
+    /**
+     *  Create the marker, infoWindow, and setup the event listeners.
+     */
+    marker = new google.maps.Marker({
+        map: map,
+        position: new google.maps.LatLng( lat, lon ),
+        title: title,
+        animation: google.maps.Animation.DROP,
+        icon: self.getIcon()
+    });
+
+    infoWindow = new google.maps.InfoWindow({
+        content: infoWindowContent( listing ),
+        maxWidth: Math.floor( (window.screen.width * maxWidthFactor) )
+    });
+
+    google.maps.event.addListener( infoWindow, 'closeclick', function(){
+        marker.setAnimation( null );
+        activeMarker = null;
+    });
+
+    google.maps.event.addListener(marker, 'click', function(){
+        self.openWindow();
+    });
 
 };
 
@@ -213,19 +289,11 @@ var ViewModel = function() {
                 matcher: function( item ) {
                     // "this" typeahead instance
                     // item is the listing record
-                    return vm.inSearchFilter( item.title(), this.query );
+                    return inSearchFilter( item.title(), this.query );
                 },
 
                 displayText: function( item ) {
                     return item.title();
-                },
-
-                afterSelect: function( item ) {
-
-                },
-
-                updater: function( item ) {
-                    return item;
                 }
 
             })
@@ -239,8 +307,8 @@ var ViewModel = function() {
                     if (current.title() == $input.val()) {
                         // current active for typeahead ( which is a listing) is same as input val
                         // therefore there is only one listing shown.
-
-                        vm.centerMap( current.location().coordinate.latitude, current.location().coordinate.longitude );
+                        vm.centerMap( current.location().latitude, current.location().longitude );
+                        current.marker.openWindow();
 
                     }
 
@@ -280,7 +348,7 @@ var ViewModel = function() {
 
         vm.listings([]);
 
-        $.ajax( '/yelp', {
+        $.ajax( 'results', {
             success: function( response ) {
 
                 if(_.has( response, 'region') ) {
@@ -318,7 +386,7 @@ var ViewModel = function() {
 
                 var region = JSON.parse( localStorage.region ),
                     listings = JSON.parse( localStorage.listings),
-                    filter = localStorage.searchFilter;
+                    filter = _.isString( localStorage.searchFilter ) ? localStorage.searchFilter : '';
 
                 if( _.isObject( region ) && _.isObject( listings ) ) {
 
@@ -474,15 +542,15 @@ var ViewModel = function() {
 
             var show = false;
 
-            if( vm.inSearchFilter( listing.title(), searchTerm ) ) {
+            if( inSearchFilter( listing.title(), searchTerm ) ) {
 
                 show = true;
 
-            } else if ( vm.inSearchFilter( listing.description(), searchTerm ) ) {
+            } else if ( inSearchFilter( listing.description(), searchTerm ) ) {
 
                 show = true;
 
-            } else if ( vm.inSearchFilter( listing.phone(), searchTerm ) ) {
+            } else if ( inSearchFilter( listing.phone(), searchTerm ) ) {
 
                 show = true;
 
@@ -494,15 +562,6 @@ var ViewModel = function() {
 
         vm.setSizes();
 
-    };
-
-    /**
-     * @description Helper function for filtering searches.
-     * @param {string} haystack - Haystack to check against
-     * @param {string} needle - Needle to search for
-     */
-    this.inSearchFilter = function( haystack, needle ) {
-        return haystack.toLowerCase().indexOf( needle.toLowerCase() ) > -1
     };
 
     /**
@@ -533,7 +592,6 @@ var ViewModel = function() {
 
 };
 
-
 /**
  * @description Callback function for google maps script tag.
  */
@@ -541,4 +599,18 @@ function initApp() {
 
     ko.applyBindings( new ViewModel() );
 
+}
+
+/**
+ * @description Helper function for filtering searches.
+ * @param {string} haystack - Haystack to check against
+ * @param {string} needle - Needle to search for
+ */
+function inSearchFilter( haystack, needle ) {
+
+    if( _.isUndefined(haystack) || _.isUndefined(needle) ) {
+        return false;
+    }
+
+    return haystack.toLowerCase().indexOf( needle.toLowerCase() ) > -1
 }

@@ -21,7 +21,8 @@
     "bootstrap": "~3.3.5",
     "underscore": "~1.8.3",
     "jquery.nicescroll": "https://github.com/inuyaksa/jquery.nicescroll.git#~3.6.0",
-    "bootstrap3-typeahead": "https://github.com/bassjobsen/Bootstrap-3-Typeahead.git#~3.1.1"
+    "bootstrap3-typeahead": "https://github.com/bassjobsen/Bootstrap-3-Typeahead.git#~3.1.1",
+    "fontawesome-markers": "https://github.com/nathan-muir/fontawesome-markers.git"
   },
   "devDependencies": {
     "oauth-signature": "~1.3.0",

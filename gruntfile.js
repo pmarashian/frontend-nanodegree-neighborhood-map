@@ -20,23 +20,16 @@ module.exports = function(grunt) {
                 options: {
                     spawn: false
                 }
-            },
+            }
         },
 
         uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-            },
             build: {
-                src: [
-                    'bower_components/underscore/underscore-min.js',
-                    'bower_components/knockout/dist/knockout.js',
-                    'bower_components/jquery/dist/jquery.min.js',
-                    'bower_components/jquery.nicescroll/jquery.nicescroll.min.js',
-                    'bower_components/q/q.js',
-                    'bower_components/bootstrap3-typeahead/bootstrap3-typeahead.min.js',
-                    'src/js/**/*.js'],
-                dest: 'deploy/<%= pkg.name %>.min.js'
+                options: {
+                    banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                },
+                src: ['src/js/app.js'],
+                dest: 'deploy/source.min.js'
             }
         },
         cssmin: {
@@ -62,11 +55,38 @@ module.exports = function(grunt) {
                 dest: 'build/styles.css'
             },
 
+            vendors: {
+                options: {
+                    separator: '\r\r'
+                },
+                src: [
+                    'bower_components/underscore/underscore-min.js',
+                    'bower_components/knockout/dist/knockout.js',
+                    'bower_components/jquery/dist/jquery.min.js',
+                    'bower_components/jquery.nicescroll/jquery.nicescroll.js',
+                    'bower_components/q/q.js',
+                    'bower_components/bootstrap3-typeahead/bootstrap3-typeahead.min.js',
+                    'bower_components/fontawesome-markers/fontawesome-markers.min.js'
+                ],
+                dest: 'deploy/vendors.js'
+            },
+
+            deploy: {
+                options: {
+
+                },
+                src: [
+                    'deploy/vendors.js',
+                    'deploy/source.min.js'
+                ],
+                dest: 'deploy/<%= pkg.name %>.min.js'
+            },
+
             scripts: {
                 options: {
                     separator: '\r\r'
                 },
-                src: ['src/js/**/*.js'],
+                src: ['src/js/app.js'],
                 dest: 'build/scripts.js'
             }
 
@@ -79,8 +99,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
-    grunt.registerTask('default', ['concat']);
-    grunt.registerTask('delta', ['concat', 'watch']);
-    grunt.registerTask('build', ['uglify', 'cssmin']);
+    grunt.registerTask('default', ['build']);
+    grunt.registerTask('delta', ['concat:styles', 'concat:scripts', 'watch']);
+    grunt.registerTask('build', ['uglify', 'concat:vendors', 'concat:deploy', 'cssmin']);
 
 };
