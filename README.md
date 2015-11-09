@@ -10,7 +10,7 @@ You can filter the search results with the search bar.
 
 Clicking on a marker opens up an infoWindow with data about the place.
 
-Demo available here[http://pmarashian.github.io/frontend-nanodegree-neighborhood-map/]
+Demo available [here](http://pmarashian.github.io/frontend-nanodegree-neighborhood-map/)
 
 ##Getting Started
 This project uses an express (node) server to request listings from the yelp api.
